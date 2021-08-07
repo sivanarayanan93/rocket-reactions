@@ -3,10 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <StyledThemeProvider theme={{}}>
+      <App />
+    </StyledThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
