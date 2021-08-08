@@ -9,10 +9,10 @@ const UiAvator = styled.div`
   }
 `
 
-const Avator = ({ url }) => {
+const Avator = ({ url }: { url: string}) => {
   return (
     <UiAvator>
-      <img src={url} />
+      <img alt="Avator" src={url} />
     </UiAvator>
   )
 }

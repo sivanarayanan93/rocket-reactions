@@ -1,12 +1,11 @@
 import styled from "styled-components";
 import Colors from '../../../shared/colors';
 
-type EmojiIcon = {
-  isSelected?: boolean;
-  bordered?: boolean;
+type TEmojiIcon = {
+  [key: string]: any
 }
 
-const UiEmojiIcon = styled.span<EmojiIcon>`
+const UiEmojiIcon = styled.span<TEmojiIcon>`
   cursor: pointer;
   padding: 0 8px;
 
@@ -20,7 +19,7 @@ const UiEmojiIcon = styled.span<EmojiIcon>`
     `
   }}
 `
-const EmojiIcon = ({children, ...props}) => {
+const EmojiIcon = ({children, ...props}: any) => {
   return (
     <UiEmojiIcon {...props}>{children}</UiEmojiIcon>
   )

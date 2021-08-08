@@ -5,6 +5,7 @@ import Button from './Button';
 import ReactTooltip from 'react-tooltip';
 import SummaryReactions from './SummaryReactions';
 import EmojiIcon from './EmojiIcon';
+import { TReaction } from '../../shared/types/Reaction';
 
 
 const reactions = [
@@ -76,14 +77,6 @@ const UiReactionsPopup = styled.div`
   }
 `;
 
-type Props = {
-  initSelectedReactions: {
-    [key: string]: {
-      [key: string]: any
-    }
-  }
-}
-
 const initSelectedReactions = [{id: '1', emoji: '👍', count: 100, userId: 4}, {id: '2', emoji: '❤️', count: 100, userId: 3},
 {
   "id": '3',
@@ -117,16 +110,17 @@ const currentUserId = 4;
 const AddReactions = () => {
   const [showReactions, setShowReactions] = useState(false),
     [showSummary, setShowSummary] = useState(false),
-    [activeTab, setActiveTab] = useState(false),
-    [selectedReactions, setSelectedReactions] = useState(initSelectedReactions);
+    [activeTab, setActiveTab] = useState<string | number>('ALL'),
+    [selectedReactions, setSelectedReactions] = useState<TReaction[]>(initSelectedReactions);
 
   useEffect(() => {
       ReactTooltip.rebuild();
   });
 
-  const handleOnEmojiClick = (e: any) => {
-    const reactionName = e.target.getAttribute('data-reaction-emoji'),
-      reactionId = e.target.getAttribute('data-reaction-id');
+  const handleOnEmojiClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement,
+      reactionName = target.getAttribute('data-reaction-emoji') as string,
+      reactionId = target.getAttribute('data-reaction-id');
 
     if(!reactionId) {
       return;
@@ -136,7 +130,7 @@ const AddReactions = () => {
 
 
     if(selectedReaction) {
-      selectedReaction.count -= 1;
+      (selectedReaction.count as number) -= 1;
     } else {
       selectedReaction = { id: reactionId, emoji: reactionName, count: 1, userId: 4}
     }
@@ -147,8 +141,8 @@ const AddReactions = () => {
     ])
   }
 
-  const handleOnEmojiHover = (e) => {
-    const reactionId = e.target.getAttribute('data-reaction-id');
+  const handleOnEmojiHover = (e: React.MouseEvent<HTMLDivElement>) => {
+    const reactionId = (e.target as HTMLElement).getAttribute('data-reaction-id');
     if(reactionId) {
       setTimeout(() => {
         setActiveTab(reactionId);

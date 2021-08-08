@@ -10,7 +10,7 @@ const ButtonWrapper = styled.button`
 `
 
 
-const Button = (props: any) => {
+const Button = (props: {[key: string]: any}) => {
   return (
     <ButtonWrapper {...props}>
     </ButtonWrapper>
