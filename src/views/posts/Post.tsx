@@ -6,16 +6,19 @@ import { TReactions } from '../../shared/Reactions/TReactions';
 const PostWrapper = styled.div`
   background-color: #fff;
   border-radius: 8px;
-  height: 300px;
-  Padding: 12px;
+  padding: 14px 24px 10px 24px;
+  margin: 10px 0;
   width: 100%;
 `;
 
 const Content = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;  
   border: 1px solid #ccc;
   border-radius: 6px;
   height: 100px;
-  margin: 10px 0;
+  margin-top: 10px;
 `
 
 const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {

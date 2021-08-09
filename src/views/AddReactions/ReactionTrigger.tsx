@@ -1,11 +1,11 @@
 import React, {useState} from 'react'
-import { TReactions } from '../../shared/Reactions/TReactions';
+import { TReaction, TReactions } from '../../shared/Reactions/TReactions';
 import Button from '../ui/Button';
 import ReactionsPoup from './ReactionsPoup';
 
 type TReactionTrigger = {
   reactions: TReactions,
-  handleOnEmojiClick: (e: React.MouseEvent<HTMLDivElement>) => void,
+  handleOnEmojiClick: (reaction: TReaction, e?: React.MouseEvent<HTMLDivElement>) => void,
   isOpen: boolean,
   onClose: () => void,
   onTrigger: () => void
@@ -29,6 +29,7 @@ const ReactionTrigger = ({ isOpen, onTrigger,  onClose, reactions, handleOnEmoji
       reactions={reactions}
       handleOnEmojiClick={handleOnEmojiClick} 
     />
+    
     <Button onClick={handleOntrigger}/>
     </>
   )

@@ -15,5 +15,5 @@ export const useOutsideChecker = (ref: any , handler: () => void) => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     }
-  });
+  }, []);
 }

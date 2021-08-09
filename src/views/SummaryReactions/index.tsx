@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef } from 'react'
+import React, {useEffect, useState, useRef, useLayoutEffect } from 'react'
 import Reactors from '../Reactors'
 import Tabs from '../ui/Tabs'
 import { getContentReactorsByReaction } from '../../shared/Reactions/ReactionsApi';
@@ -12,15 +12,15 @@ type TSummaryReaction = {
   shouldShow: boolean,
   onClose: any,
   activeTab: TStringOrNumber,
-  position: number | null,
   tabList: TReactions
 }
 
-const SummaryReactions = ({position, postId, activeTab, tabList, onClose, shouldShow}: TSummaryReaction) => {
+const SummaryReactions = ({postId, activeTab, tabList, onClose, shouldShow, ...props}: TSummaryReaction) => {
   const [currentTab, setCurrentTab] = useState(activeTab),
     [reactors, setReactors] = useState<any>({}),
     [tabs, setTabs] = useState(tabList),
-    ref = useRef<HTMLDivElement>(null);
+    [top, setTop] = useState(0),
+    targetRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setTabs([...[{id: 'ALL', emoji: 'ALL'} as TReaction], ...tabList]);
@@ -44,20 +44,27 @@ const SummaryReactions = ({position, postId, activeTab, tabList, onClose, should
     }
   }, [currentTab]);
 
-  const handleOnTabClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const tabId = (e.target as HTMLElement).getAttribute('data-tab-id');
-
+  const handleOnTabClick = (tabId: TStringOrNumber) => {
     if(tabId) {
       setCurrentTab(tabId);
     }
   }
 
-  useOutsideChecker(ref, onClose);
+  useLayoutEffect(() => {
+    const ele = targetRef.current,
+      parentEle = ele && ele.offsetParent as HTMLElement;
+
+    if (parentEle) {
+      setTop(parentEle.offsetTop >= 310 ? -300 : 52)
+    }
+  }, [targetRef])
+
+  useOutsideChecker(targetRef, onClose);
 
   return (
     <>
     {shouldShow && 
-      <UiSummary ref={ref} position={position + 'px'}>
+      <UiSummary {...props} ref={targetRef} position={top + 'px'}>
         <h3>Reactions</h3>
         <Tabs tabs={tabs} activeTab={currentTab} handleOnTabClick={handleOnTabClick}/>
         <TabPanel>

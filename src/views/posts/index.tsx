@@ -9,6 +9,7 @@ const Posts = ({ contents }: { contents : TPost[]}) => {
 
   return (
     <>
+      <h2>Posts</h2>
       {contents && contents.map((content) => (
         <Post reactions={reactions} key={content.id} post={content}/>
       ))}

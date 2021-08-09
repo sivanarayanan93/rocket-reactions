@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { UiAddReaction } from './styles';
 import SummaryReactions from '../SummaryReactions';
 import SelectedReactions from './SelectedReactions';
@@ -7,9 +7,10 @@ import { addReaction, getReactionsByPost, removeReaction } from '../../shared/Re
 import { TReducers } from '../../reducers';
 import ReactionTrigger from './ReactionTrigger';
 import { getUpdatedReactions } from '../../shared/Reactions/ReactionsModel';
-import { TReactions } from '../../shared/Reactions/TReactions';
+import { TReaction, TReactions } from '../../shared/Reactions/TReactions';
 import { TUser } from '../../shared/Users/TUsers';
 import { TStringOrNumber } from '../../shared/common/TCommon';
+import { useOutsideHoverCheck } from '../../hooks/useOutsideHoverCheck';
 
 type TAddReactions = {
   postId: TStringOrNumber,
@@ -22,7 +23,7 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
     [showSummary, setShowSummary] = useState(false),
     [activeTab, setActiveTab] = useState<TStringOrNumber>('ALL'),
     [selectedReactions, setSelectedReactions] = useState<TReactions>([]),
-    [summaryElePosition, setSummaryElePosition] = useState<number | null>(null);
+    uiAddReactionRef = useRef(null);
 
   
   useEffect(() => {
@@ -39,11 +40,11 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
   }, [reactions, postId]);
   
 
-  const handleOnEmojiClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    const target = e.target as HTMLElement,
-      reactionName = target.getAttribute('data-reaction-emoji') as string,
-      reactionId = parseInt(target.getAttribute('data-reaction-id') as string);
+  const handleOnEmojiClick = (reaction: TReaction) => {
+    // e.stopPropagation();
+    // const target = e.target as HTMLElement,
+    const  reactionName = reaction && reaction.emoji,
+      reactionId = reaction && reaction.id;
 
     if(!reactionId) {
       return;
@@ -93,9 +94,8 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
       reactionId = target && target.getAttribute('data-reaction-id');
 
     if(reactionId) {
-      setSummaryElePosition(target.offsetLeft);
       setActiveTab(reactionId);
-      // setShowSummary(true);
+      setShowSummary(true);
     }
   }
 
@@ -103,14 +103,16 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
     setShowSummary(false);
   }
 
+  useOutsideHoverCheck(uiAddReactionRef, handleOnEmojiMouseDown);
+
   return (
-    <UiAddReaction>
-       <SummaryReactions 
+    <UiAddReaction ref={uiAddReactionRef}>
+       {showSummary && <SummaryReactions 
         shouldShow={showSummary}
         onClose={handleOnEmojiMouseDown}
-        position={summaryElePosition}
         tabList={selectedReactions}
         activeTab={activeTab} postId={postId}/>
+       }
 
       <SelectedReactions
         reactions={selectedReactions}
@@ -125,7 +127,7 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
         onTrigger={() => setShowReactions(true)}
         reactions={reactions} 
         handleOnEmojiClick={handleOnEmojiClick} 
-      />  
+      /> 
     </UiAddReaction>
   )
 }

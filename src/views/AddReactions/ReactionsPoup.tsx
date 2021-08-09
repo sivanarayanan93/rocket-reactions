@@ -3,53 +3,47 @@ import { UiReactionsPopup} from './styles';
 import EmojiIcon from '../ui/EmojiIcon';
 import ReactTooltip from 'react-tooltip';
 import { useOutsideChecker } from '../../hooks/UseOutsideChecker';
-import { TReactions } from '../../shared/Reactions/TReactions';
+import { TReaction, TReactions } from '../../shared/Reactions/TReactions';
 
 type TReactionsPoup = {
   reactions: TReactions,
-  handleOnEmojiClick: (e: React.MouseEvent<HTMLDivElement>) => void,
+  handleOnEmojiClick: (reaction: TReaction, e?: React.MouseEvent<HTMLDivElement>) => void,
   isOpen: boolean,
   onClose: () => void,
   left: number
 }
 
 const ReactionsPoup = ({ reactions, handleOnEmojiClick, isOpen, onClose, left}: TReactionsPoup) => {
-  const poupRef = useRef(null),
-    [shouldShow, setShouldShow] = useState(false);
+  const poupRef = useRef(null);
 
   useEffect(() => {
     ReactTooltip.rebuild();
   });
 
   const closePopup = () => {
-    setShouldShow(false);
     onClose();
   }
   
-  const handleOnClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    handleOnEmojiClick(e);
+  const handleOnClick = (reaction:TReaction) => {
+    handleOnEmojiClick(reaction);
     onClose();
   }
-
-  useEffect(() => {
-    setShouldShow(isOpen);
-  }, [isOpen])
 
   useOutsideChecker(poupRef, closePopup)
 
   return (
     <>
-      {shouldShow && <UiReactionsPopup left={left} ref={poupRef} onClickCapture={handleOnClick}>
+      {isOpen && <UiReactionsPopup left={left} ref={poupRef}>
         {reactions && reactions.map((reaction) => (
           <a key={reaction.id}>
-          <EmojiIcon
+          <EmojiIcon onClick={() => handleOnClick(reaction)}
             data-reaction-emoji={reaction.emoji} 
             data-reaction-id={reaction.id} 
             data-for="reactions" 
             data-tip={reaction.name}>
             {reaction.emoji}
           </EmojiIcon>
-          <ReactTooltip id="reactions" place="top" effect="solid"/>
+          <ReactTooltip className="react-tooltip" id="reactions" place="top" effect="solid"/>
           </a>
         ))}
       </UiReactionsPopup>
