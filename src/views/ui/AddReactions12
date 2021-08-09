@@ -111,7 +111,7 @@ const AddReactions = () => {
   const [showReactions, setShowReactions] = useState(false),
     [showSummary, setShowSummary] = useState(false),
     [activeTab, setActiveTab] = useState<string | number>('ALL'),
-    [selectedReactions, setSelectedReactions] = useState<TReaction[]>(initSelectedReactions);
+    [selectedReactions, setSelectedReactions] = useState<TReactions>(initSelectedReactions);
 
   useEffect(() => {
       ReactTooltip.rebuild();

@@ -1,10 +1,11 @@
 import React from 'react';
-import { TReaction } from '../../../shared/types/Reaction';
+import { TStringOrNumber } from '../../../shared/common/TCommon';
+import { TReactions } from '../../../shared/Reactions/TReactions';
 import { UiTabs, Tab } from './styles';
 
 type TTabs = {
-  tabs: TReaction[],
-  activeTab: string | number,
+  tabs: TReactions,
+  activeTab: TStringOrNumber,
   handleOnTabClick: (e: React.MouseEvent<HTMLDivElement>) => void
 }
 

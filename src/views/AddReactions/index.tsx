@@ -1,41 +1,35 @@
 import React, { useState, useEffect } from 'react'
 import { UiAddReaction } from './styles';
 import SummaryReactions from '../SummaryReactions';
-import { TReaction } from '../../shared/types/Reaction';
 import SelectedReactions from './SelectedReactions';
 import { useSelector } from 'react-redux';
-import { addReaction, getReactionsByPost, removeReaction } from '../../shared/User/UserApi';
+import { addReaction, getReactionsByPost, removeReaction } from '../../shared/Reactions/ReactionsApi';
 import { TReducers } from '../../reducers';
-import { User } from '../../shared/types/User';
 import ReactionTrigger from './ReactionTrigger';
+import { getUpdatedReactions } from '../../shared/Reactions/ReactionsModel';
+import { TReactions } from '../../shared/Reactions/TReactions';
+import { TUser } from '../../shared/Users/TUsers';
+import { TStringOrNumber } from '../../shared/common/TCommon';
 
 type TAddReactions = {
-  postId: string | number,
-  reactions: TReaction[]
+  postId: TStringOrNumber,
+  reactions: TReactions
 }
 
 const AddReactions = ({ postId, reactions }: TAddReactions) => {
-  const currentUser = useSelector<TReducers>(state => state.User.currentUser) as User,
+  const currentUser = useSelector<TReducers>(state => state.User.currentUser) as TUser,
     [showReactions, setShowReactions] = useState(false),
     [showSummary, setShowSummary] = useState(false),
-    [activeTab, setActiveTab] = useState<string | number>('ALL'),
-    [selectedReactions, setSelectedReactions] = useState<TReaction[]>([]),
+    [activeTab, setActiveTab] = useState<TStringOrNumber>('ALL'),
+    [selectedReactions, setSelectedReactions] = useState<TReactions>([]),
     [summaryElePosition, setSummaryElePosition] = useState<number | null>(null);
 
   
   useEffect(() => {
     if (reactions.length) {
       getReactionsByPost(postId).then((res) => {
-        const response = res as TReaction[];
+        const response = res as TReactions;
 
-        for(let reaction of response) {
-          const index = reactions.findIndex(item => item.id === reaction.id);
-    
-          if(index >= 0) {
-            reaction.emoji = reactions[index].emoji;
-          }
-        }
-    
         setSelectedReactions([
           ...selectedReactions,
           ...response
@@ -55,50 +49,43 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
       return;
     }
 
-    const index = selectedReactions.findIndex(reaction => reaction.id === reactionId),
-      selectedReaction = selectedReactions[index];
+    const selectedReaction = selectedReactions.find(reaction => reaction.id === reactionId);
 
     
     if(selectedReaction && selectedReaction.isReactedByCurrentUser) {
-      removeReaction(selectedReaction.contentReactionId).then((res) => {
-        if (index >= 0) {
-          const selectedReactionsCopy = [...selectedReactions],
-            selectedReactionCopy = selectedReactionsCopy[index];
-
-          if(selectedReactionCopy) {
-            selectedReactionCopy.count = Number.isInteger(selectedReactionCopy.count) ?  selectedReactionCopy.count - 1 : 1;
-            selectedReactionCopy.isReactedByCurrentUser = false;
-            delete selectedReactionCopy.contentReactionId;
-
-            setSelectedReactions(selectedReactionsCopy);
-          }
-
-        } else {
-          setSelectedReactions(prevState => prevState.filter(item => item.id !== reactionId));
-        }
-      });
+      const postData = {id: reactionId, emoji: reactionName, contentReactionId: selectedReaction.contentReactionId};
+      deleteReaction(postData);
     } else {
-      addReaction({id: reactionId, contentId: postId, userId: currentUser.id}).then((res) => {
-        if (selectedReaction) {
-          const selectedReactionsCopy = [...selectedReactions];
-
-          selectedReactionsCopy[index].count += 1;
-          selectedReactionsCopy[index].isReactedByCurrentUser = true;
-          selectedReactionsCopy[index].contentReactionId = res.data.id
-
-          setSelectedReactions(selectedReactionsCopy)
-        } else {
-          setSelectedReactions([
-            ...selectedReactions,
-            { id: reactionId,
-              contentReactionId:res.data.id,
-              emoji: reactionName,
-              count: 1,
-              isReactedByCurrentUser: true}
-          ]);
-        }
-      })
+      const postData = {id: reactionId, emoji: reactionName, contentId: postId, userId: currentUser.id};
+      postReaction(postData);      
     }
+  }
+
+  const postReaction = (data: any) => {
+    const {id, emoji, contentId, userId } = data;
+
+    addReaction({id, contentId, userId}).then((res) => {
+      const contentReactionId = res.data.id,
+        payload = {id, emoji, contentReactionId};
+
+        successReactionCallback(payload, true);
+    })
+  }
+
+  const deleteReaction = (data: any) => {
+    const {id, emoji, contentReactionId} = data;
+
+    removeReaction(contentReactionId).then((res) => {
+      const payload = {id, emoji, contentReactionId};
+
+      successReactionCallback(payload);
+    });
+  }
+
+  const successReactionCallback = (payload: any, shouldAddRection = false) => {
+    const updatedReactions = getUpdatedReactions(selectedReactions, payload, shouldAddRection);
+    
+    setSelectedReactions(updatedReactions);
   }
 
   const handleOnEmojiHover = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -108,7 +95,7 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
     if(reactionId) {
       setSummaryElePosition(target.offsetLeft);
       setActiveTab(reactionId);
-      setShowSummary(true);
+      // setShowSummary(true);
     }
   }
 

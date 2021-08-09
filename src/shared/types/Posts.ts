@@ -1,5 +1,7 @@
+import { TStringOrNumber } from "../common/TCommon";
+
 export type Post = {
- id: number | string,
+ id: TStringOrNumber,
  content: string
 }
 

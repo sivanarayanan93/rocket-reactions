@@ -1,8 +1,7 @@
-import React from 'react'
 import styled from 'styled-components';
 import AddReactions from '../AddReactions';
 import { Post as TPost } from '../../shared/types/Posts';
-import { TReaction } from '../../shared/types/Reaction';
+import { TReactions } from '../../shared/Reactions/TReactions';
 
 const PostWrapper = styled.div`
   background-color: #fff;
@@ -19,7 +18,7 @@ const Content = styled.div`
   margin: 10px 0;
 `
 
-const Post = ({ post, reactions }: { post: TPost, reactions: TReaction[]}) => {
+const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
   return (
     <PostWrapper>
         <Content>{ post.content } - {post.id}</Content> 

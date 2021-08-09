@@ -1,27 +1,27 @@
-import {useEffect, useState, useRef } from 'react'
+import React, {useEffect, useState, useRef } from 'react'
 import Reactors from '../Reactors'
 import Tabs from '../ui/Tabs'
-import { getContentReactorsByReaction } from '../../shared/User/UserApi';
+import { getContentReactorsByReaction } from '../../shared/Reactions/ReactionsApi';
 import { UiSummary, TabPanel } from './styles';
 import { useOutsideChecker } from '../../hooks/UseOutsideChecker';
-import { TReaction } from '../../shared/types/Reaction';
+import { TReaction, TReactions } from '../../shared/Reactions/TReactions';
+import { TStringOrNumber } from '../../shared/common/TCommon';
 
 type TSummaryReaction = {
-  postId: number | string,
+  postId: TStringOrNumber,
   shouldShow: boolean,
   onClose: any,
-  activeTab: string | number,
+  activeTab: TStringOrNumber,
   position: number | null,
-  tabList: TReaction[]
+  tabList: TReactions
 }
 
 const SummaryReactions = ({position, postId, activeTab, tabList, onClose, shouldShow}: TSummaryReaction) => {
   const [currentTab, setCurrentTab] = useState(activeTab),
     [reactors, setReactors] = useState<any>({}),
     [tabs, setTabs] = useState(tabList),
-    ref = useRef(null);
+    ref = useRef<HTMLDivElement>(null);
 
-  useOutsideChecker(ref, onClose);
   useEffect(() => {
     setTabs([...[{id: 'ALL', emoji: 'ALL'} as TReaction], ...tabList]);
   }, [tabList]);
@@ -51,6 +51,8 @@ const SummaryReactions = ({position, postId, activeTab, tabList, onClose, should
       setCurrentTab(tabId);
     }
   }
+
+  useOutsideChecker(ref, onClose);
 
   return (
     <>

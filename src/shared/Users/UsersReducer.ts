@@ -1,9 +1,8 @@
-import { TReaction } from "../types/Reaction"
-import { User } from "../types/User"
+import { TUser, TUsersReducer } from "./TUsers"
 
-const initState = {
-  currentUser: {} as User,
-  reactions: [] as TReaction[]
+const initState:TUsersReducer = {
+  currentUser: {} as TUser,
+  reactions: []
 }
 
 type TAction = {
@@ -13,12 +12,7 @@ type TAction = {
   }
 }
 
-export type TUserReducer = {
-  currentUser:  User,
-  reactions: TReaction[]
-}
-
-const UserReducer = (state:TUserReducer = initState, action:TAction) => {
+const UserReducer = (state:TUsersReducer = initState, action:TAction) => {
   switch(action.type) {
     case "ADD_USER_INFO":
       return { ...state,

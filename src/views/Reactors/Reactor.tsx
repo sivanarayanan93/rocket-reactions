@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 import Avator from '../ui/Avator';
 import EmojiIcon from '../ui/EmojiIcon';
-import { TReactor } from '../../shared/types/Reactor';
-
+import { IReactor } from '../../shared/Reactions/TReactions';
 
 const UiReactor = styled.div`  
   display: flex;
@@ -10,7 +9,7 @@ const UiReactor = styled.div`
   padding: 8px 0;
 `
 
-const Reactor = ({reactor}: { reactor: TReactor}) => {
+const Reactor = ({reactor}: { reactor: IReactor}) => {
   return (
     <UiReactor>
       <Avator url={reactor.avatar}/>

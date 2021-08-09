@@ -1,9 +1,10 @@
 import { combineReducers } from 'redux';
-import  UserReducer, { TUserReducer }  from './shared/User/UserReducer';
+import { TUsersReducer } from './shared/Users/TUsers';
+import  UserReducer from './shared/Users/UsersReducer';
 
 
 export type TReducers = {
-  User: TUserReducer
+  User: TUsersReducer
 }
 
 const Reducers = combineReducers({

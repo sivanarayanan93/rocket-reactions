@@ -1,10 +1,10 @@
 import React, {useState} from 'react'
-import { TReaction } from '../../shared/types/Reaction';
+import { TReactions } from '../../shared/Reactions/TReactions';
 import Button from '../ui/Button';
 import ReactionsPoup from './ReactionsPoup';
 
 type TReactionTrigger = {
-  reactions: TReaction[],
+  reactions: TReactions,
   handleOnEmojiClick: (e: React.MouseEvent<HTMLDivElement>) => void,
   isOpen: boolean,
   onClose: () => void,

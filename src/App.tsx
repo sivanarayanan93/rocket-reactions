@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import './App.css';
 import Posts from './views/posts';
-import { getUserInfo } from './shared/User/UserApi';
+import { getUserInfo } from './shared/Users/UsersApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { TReducers } from './reducers';
 

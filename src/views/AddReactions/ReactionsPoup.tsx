@@ -3,10 +3,10 @@ import { UiReactionsPopup} from './styles';
 import EmojiIcon from '../ui/EmojiIcon';
 import ReactTooltip from 'react-tooltip';
 import { useOutsideChecker } from '../../hooks/UseOutsideChecker';
-import { TReaction } from '../../shared/types/Reaction';
+import { TReactions } from '../../shared/Reactions/TReactions';
 
 type TReactionsPoup = {
-  reactions: TReaction[],
+  reactions: TReactions,
   handleOnEmojiClick: (e: React.MouseEvent<HTMLDivElement>) => void,
   isOpen: boolean,
   onClose: () => void,

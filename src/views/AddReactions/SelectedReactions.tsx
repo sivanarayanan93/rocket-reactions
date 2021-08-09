@@ -1,9 +1,9 @@
 import React from 'react'
-import { TReaction } from '../../shared/types/Reaction'
+import { TReactions } from '../../shared/Reactions/TReactions'
 import EmojiIcon from '../ui/EmojiIcon'
 
 type TSelectedReactions = {
-  reactions: TReaction[],
+  reactions: TReactions,
   handleOnEmojiClick: (e: React.MouseEvent<HTMLDivElement>) => void,
   handleOnEmojiHover: (e: React.MouseEvent<HTMLDivElement>) => void,
   handleOnEmojiMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void
