@@ -3,7 +3,7 @@ import Reactors from '../Reactors'
 import Tabs from '../ui/Tabs'
 import { getContentReactorsByReaction } from '../../shared/Reactions/ReactionsApi';
 import { UiSummary, TabPanel } from './styles';
-import { useOutsideChecker } from '../../hooks/UseOutsideChecker';
+import useOutsideChecker from '../../hooks/UseOutsideChecker';
 import { TReaction, TReactions } from '../../shared/Reactions/TReactions';
 import { TStringOrNumber } from '../../shared/common/TCommon';
 
@@ -32,17 +32,23 @@ const SummaryReactions = ({postId, activeTab, tabList, onClose, shouldShow, ...p
 
   useEffect(() => {
     const currentTabReactors = reactors[currentTab] || [];
+    
+    const successgetContentReactorsCallback = (res: any, currentTabReactors: any) => {
+      setReactors({
+        ...reactors,
+        [currentTab]: [...currentTabReactors, ...[...res]]
+      })
+    }
+
 
     if (currentTabReactors && !currentTabReactors.length) {
       getContentReactorsByReaction(postId, currentTab).then((res) => {
-      
-        setReactors({
-          ...reactors,
-          [currentTab]: [...currentTabReactors, ...[...res]]
-        })
+        if(targetRef.current) {
+          successgetContentReactorsCallback(res, currentTabReactors);
+        }
       })
     }
-  }, [currentTab]);
+  }, [currentTab, postId, reactors, targetRef]);
 
   const handleOnTabClick = (tabId: TStringOrNumber) => {
     if(tabId) {

@@ -1,8 +1,8 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { UiReactionsPopup} from './styles';
 import EmojiIcon from '../ui/EmojiIcon';
 import ReactTooltip from 'react-tooltip';
-import { useOutsideChecker } from '../../hooks/UseOutsideChecker';
+import useOutsideChecker from '../../hooks/UseOutsideChecker';
 import { TReaction, TReactions } from '../../shared/Reactions/TReactions';
 
 type TReactionsPoup = {
@@ -35,7 +35,7 @@ const ReactionsPoup = ({ reactions, handleOnEmojiClick, isOpen, onClose, left}: 
     <>
       {isOpen && <UiReactionsPopup left={left} ref={poupRef}>
         {reactions && reactions.map((reaction) => (
-          <a key={reaction.id}>
+          <span key={reaction.id}>
           <EmojiIcon onClick={() => handleOnClick(reaction)}
             data-reaction-emoji={reaction.emoji} 
             data-reaction-id={reaction.id} 
@@ -44,7 +44,7 @@ const ReactionsPoup = ({ reactions, handleOnEmojiClick, isOpen, onClose, left}: 
             {reaction.emoji}
           </EmojiIcon>
           <ReactTooltip className="react-tooltip" id="reactions" place="top" effect="solid"/>
-          </a>
+          </span>
         ))}
       </UiReactionsPopup>
       }

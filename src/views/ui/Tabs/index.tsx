@@ -15,7 +15,7 @@ const Tabs = ({tabs, activeTab, handleOnTabClick}: TTabs) => {
   return (
     <UiTabs>
       {tabs && tabs.map((tab) => (
-        <Tab onClick={e => handleOnTabClick(tab.id, e)} data-tab-id={tab.id} data-tab-active-id={activeTab} isActive={activeTab == tab.id} key={`tab_${tab.id}`}>
+        <Tab onClick={e => handleOnTabClick(tab.id, e)} data-tab-id={tab.id} data-tab-active-id={activeTab} isActive={String(activeTab) === String(tab.id)} key={`tab_${tab.id}`}>
           <EmojiIcon>
             {tab.emoji}
             {tab.count && <>

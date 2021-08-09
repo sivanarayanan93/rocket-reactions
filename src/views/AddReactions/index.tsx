@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { UiAddReaction } from './styles';
 import SummaryReactions from '../SummaryReactions';
 import SelectedReactions from './SelectedReactions';
@@ -26,18 +26,18 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
     uiAddReactionRef = useRef(null);
 
   
-  useEffect(() => {
-    if (reactions.length) {
-      getReactionsByPost(postId).then((res) => {
-        const response = res as TReactions;
+  useEffect(() => {    
+    getReactionsByPost(postId).then((res) => {
+      successSelectedReactionsCallback(res as TReactions);
+    })
+  }, [postId]);
 
-        setSelectedReactions([
-          ...selectedReactions,
-          ...response
-        ]);
-      })
-    }
-  }, [reactions, postId]);
+  const successSelectedReactionsCallback = (response: TReactions) => {
+    setSelectedReactions(prevState => [
+      ...prevState,
+      ...response
+    ]);
+  } 
   
 
   const handleOnEmojiClick = (reaction: TReaction) => {
@@ -103,13 +103,20 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
     setShowSummary(false);
   }
 
+  const memoizedCallback = useCallback(
+    () => {
+      handleOnEmojiMouseDown()
+    },
+    [],
+  )
+
   useOutsideHoverCheck(uiAddReactionRef, handleOnEmojiMouseDown);
 
   return (
     <UiAddReaction ref={uiAddReactionRef}>
        {showSummary && <SummaryReactions 
         shouldShow={showSummary}
-        onClose={handleOnEmojiMouseDown}
+        onClose={memoizedCallback}
         tabList={selectedReactions}
         activeTab={activeTab} postId={postId}/>
        }

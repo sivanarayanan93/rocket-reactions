@@ -15,5 +15,6 @@ export const useOutsideHoverCheck = (ref: any , handler: () => void) => {
     return () => {
       document.removeEventListener("mouseover", handleHoverOutside);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
