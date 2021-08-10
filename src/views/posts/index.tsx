@@ -1,10 +1,11 @@
-import Post from './Post';
-import { Post as TPost } from '../../shared/types/Posts';
+
+import { TPosts } from '../../shared/Posts/TPosts';
 import { useSelector } from 'react-redux';
 import { TReducers } from '../../reducers';
+import Post from './Post';
 
 
-const Posts = ({ contents }: { contents : TPost[]}) => {
+const Posts = ({ contents }: { contents : TPosts}) => {
   const reactions = useSelector<TReducers, TReducers["User"]["reactions"]>(state => state.User.reactions);
 
   return (

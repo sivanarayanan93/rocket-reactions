@@ -18,7 +18,7 @@ export const UiAddReaction = styled.div`
 
 export const UiReactionsPopup = styled.div<TUiReactionsPopup>`
   height: 32px;
-  background-color: ${COLORS.white};
+  background-color: ${COLORS.WHITE};
   border-radius: 24px;
   box-shadow: 0px 1px 2px 1px lightgray;
   position: absolute;

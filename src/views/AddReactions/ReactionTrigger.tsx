@@ -8,11 +8,12 @@ type TReactionTrigger = {
   handleOnEmojiClick: (reaction: TReaction, e?: React.MouseEvent<HTMLDivElement>) => void,
   isOpen: boolean,
   onClose: () => void,
-  onTrigger: () => void
+  onTrigger: () => void,
+  children?: React.ReactNode
 }
 
 
-const ReactionTrigger = ({ isOpen, onTrigger,  onClose, reactions, handleOnEmojiClick}: TReactionTrigger) => {
+const ReactionTrigger = ({ isOpen, onTrigger,  onClose, reactions, handleOnEmojiClick, children, ...props}: TReactionTrigger) => {
   const [left, setLeft] = useState(0)
   const handleOntrigger = (e: React.MouseEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
@@ -21,13 +22,13 @@ const ReactionTrigger = ({ isOpen, onTrigger,  onClose, reactions, handleOnEmoji
     onTrigger();
   }
   return (
-    <>
+    <div {...props}>
       <Button 
         aria-haspopup="true"
         aria-expanded="false"
         data-toggle="dropdown"
         onClick={handleOntrigger} style ={{ fontWeight: '600'}}>
-        R
+          {children}
       </Button>
       <ReactionsPoup 
         left={left}
@@ -36,7 +37,7 @@ const ReactionTrigger = ({ isOpen, onTrigger,  onClose, reactions, handleOnEmoji
         reactions={reactions}
         handleOnEmojiClick={handleOnEmojiClick} 
       />
-    </>
+    </div>
   )
 }
 

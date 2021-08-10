@@ -7,7 +7,12 @@ export const API_URL = {
   REACTIONS: '/reactions'
 }
 
-export const getSelectedReactions = (data: any) => {
+/**
+ * get Processed Selected Reactions for the post
+ * @param data 
+ */
+
+export const getSelelcedReactions = (data: any) => {
   const selectedReactionsTemp: TReactions = [],
   currentUser = getCurrentUserFromStore(),
   allReactions = getReactionsFromStore();
@@ -18,8 +23,11 @@ export const getSelectedReactions = (data: any) => {
 
     const isReactedByCurrentUser = currentUser.id === postReaction.user_id;
 
+    // Finding total count of reactions
     if(index >= 0) {
       selectedReactionsTemp[index].count += 1;
+
+      // Finding if a reaction added by the current user
       if (!selectedReactionsTemp[index].isReactedByCurrentUser && isReactedByCurrentUser) {
         selectedReactionsTemp[index].isReactedByCurrentUser = isReactedByCurrentUser;
         selectedReactionsTemp[index].contentReactionId = postReaction.id;
@@ -40,6 +48,10 @@ export const getSelectedReactions = (data: any) => {
   return selectedReactionsTemp;
 }
 
+/**
+ * 
+ * @param resData 
+ */
 export const getContentReactors = (resData: any) => {
 
   const allUsers = resData[0].data,
@@ -73,11 +85,13 @@ export const getUpdatedReactions = (reactions: TReactions, reactionPayload: any,
    reaction = tempReactions[index],
    emoji = reaction ? reaction.emoji : reactionPayload.emoji;
 
+   // Removing items if count is <= 1 on removing a reaction
    if (!shouldAddReaction && reaction.count <= 1) {
     return reactions.filter(item => item.id !== reactionId);
   }
 
    const getTempReactions = () => {
+      // Updating existing reaction's count to the state 
       tempReactions[index] = {
         ...reaction,
         count: shouldAddReaction ? reaction.count + 1 : reaction.count - 1,
@@ -93,6 +107,7 @@ export const getUpdatedReactions = (reactions: TReactions, reactionPayload: any,
    if (reaction) {
     updatedReactions = getTempReactions();
    } else {
+    // Addind new reactions to the state 
     updatedReactions = [...reactions,
       { id: reactionId,
         contentReactionId: contentReactionId,

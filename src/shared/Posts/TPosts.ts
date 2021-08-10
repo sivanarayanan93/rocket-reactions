@@ -1,8 +1,8 @@
 import { TStringOrNumber } from "../common/TCommon";
 
-export type Post = {
+export type TPost = {
  id: TStringOrNumber,
  content: string
 }
 
-export type Posts = Post[];
+export type TPosts = TPost[];

@@ -1,13 +1,7 @@
-import styled from 'styled-components';
 import Avatar from '../ui/Avatar';
 import EmojiIcon from '../ui/EmojiIcon';
 import { IReactor } from '../../shared/Reactions/TReactions';
-
-const UiReactor = styled.div`  
-  display: flex;
-  align-items: center;
-  padding: 8px 0;
-`
+import { UiReactor } from './styles';
 
 const Reactor = ({reactor}: { reactor: IReactor}) => {
   return (

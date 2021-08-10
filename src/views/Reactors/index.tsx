@@ -1,16 +1,13 @@
 import React from 'react';
-import styled from 'styled-components';
+import { IReactor } from '../../shared/Reactions/TReactions';
+
 import Reactor from './Reactor';
+import { UiReactors } from './styles';
 
-
-const UiReactors = styled.div`
-  padding: 0 16px;
-`
-
-const Reactors: React.FunctionComponent<any> = ({ reactors }) => {
+const Reactors = ({ reactors }: { reactors: IReactor[]}) => {
   return (
     <UiReactors>
-      {reactors && reactors.map((reactor: any) => (
+      {reactors && reactors.map((reactor) => (
         <Reactor key={reactor.id} reactor={reactor} />
       ))}
     </UiReactors>

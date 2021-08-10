@@ -3,7 +3,7 @@ import { UiAddReaction } from './styles';
 import SummaryReactions from '../SummaryReactions';
 import SelectedReactions from './SelectedReactions';
 import { useSelector } from 'react-redux';
-import { addReaction, getReactionsByPost, removeReaction } from '../../shared/Reactions/ReactionsApi';
+import { addReaction, getReactionsByPost, deleteReaction } from '../../shared/Reactions/ReactionsApi';
 import { TReducers } from '../../reducers';
 import ReactionTrigger from './ReactionTrigger';
 import { getUpdatedReactions } from '../../shared/Reactions/ReactionsModel';
@@ -25,7 +25,7 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
     [selectedReactions, setSelectedReactions] = useState<TReactions>([]),
     uiAddReactionRef = useRef(null);
 
-  
+
   useEffect(() => {    
     getReactionsByPost(postId).then((res) => {
       successSelectedReactionsCallback(res as TReactions);
@@ -41,8 +41,6 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
   
 
   const handleOnEmojiClick = (reaction: TReaction) => {
-    // e.stopPropagation();
-    // const target = e.target as HTMLElement,
     const  reactionName = reaction && reaction.emoji,
       reactionId = reaction && reaction.id;
 
@@ -55,7 +53,7 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
     
     if(selectedReaction && selectedReaction.isReactedByCurrentUser) {
       const postData = {id: reactionId, emoji: reactionName, contentReactionId: selectedReaction.contentReactionId};
-      deleteReaction(postData);
+      removeReaction(postData);
     } else {
       const postData = {id: reactionId, emoji: reactionName, contentId: postId, userId: currentUser.id};
       postReaction(postData);      
@@ -73,10 +71,10 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
     })
   }
 
-  const deleteReaction = (data: any) => {
+  const removeReaction = (data: any) => {
     const {id, emoji, contentReactionId} = data;
 
-    removeReaction(contentReactionId).then((res) => {
+    deleteReaction(contentReactionId).then((res) => {
       const payload = {id, emoji, contentReactionId};
 
       successReactionCallback(payload);
@@ -127,7 +125,9 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
         onTrigger={() => setShowReactions(true)}
         reactions={reactions} 
         handleOnEmojiClick={handleOnEmojiClick} 
-      /> 
+      >
+        R
+      </ReactionTrigger>
     </UiAddReaction>
   )
 }

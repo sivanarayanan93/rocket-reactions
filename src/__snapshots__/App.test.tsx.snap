@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders learn react link 1`] = `
+<DocumentFragment>
+  <h3
+    class="sc-crzoAE ewvRHE"
+  >
+    Rocket Reactions
+  </h3>
+  <div
+    class="App"
+  >
+    <h3>
+      Loading...
+    </h3>
+  </div>
+</DocumentFragment>
+`;

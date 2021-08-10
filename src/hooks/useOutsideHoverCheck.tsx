@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
-export const useOutsideHoverCheck = (ref: any , handler: () => void) => {
+export const useOutsideHoverCheck = (ref: React.RefObject<HTMLElement> , handler: () => void) => {
   useEffect(() => {
     const handleHoverOutside = (event: any) => {
       if (ref.current && !ref.current.contains(event.target)) {

@@ -6,9 +6,9 @@ type TUiSummary = {
 }
 
 export const UiSummary = styled.div<TUiSummary>`
-  background-color: ${COLORS.white};
+  background-color: ${COLORS.WHITE};
   border-radius: 4px;
-  box-shadow: 0px 1px 4px 2px ${COLORS.borderColor};
+  box-shadow: 0px 1px 4px 2px ${COLORS.LIGHT_GRAY};
   font-size: 14px;
   font-weight: 600;
   position: absolute;
@@ -20,8 +20,4 @@ export const UiSummary = styled.div<TUiSummary>`
     padding: 0 16px;
     margin-bottom: 0;
   }
-`
-export const TabPanel = styled.div`
-  height: 224px;
-  overflow-y: auto;
 `

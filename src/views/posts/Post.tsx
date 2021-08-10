@@ -1,10 +1,11 @@
 import styled from 'styled-components';
 import AddReactions from '../AddReactions';
-import { Post as TPost } from '../../shared/types/Posts';
+import { TPost } from '../../shared/Posts/TPosts';
 import { TReactions } from '../../shared/Reactions/TReactions';
+import COLORS from '../../shared/colors';
 
 const PostWrapper = styled.div`
-  background-color: #fff;
+  background-color: ${COLORS.WHITE};
   border-radius: 8px;
   padding: 14px 24px 10px 24px;
   margin: 10px 0;

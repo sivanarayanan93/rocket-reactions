@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
-const useOutsideChecker = (ref: any , handler: () => void) => {
+const useOutsideChecker = (ref: React.RefObject<HTMLElement> , handler: () => void) => {
   useEffect(() => {
     const handleClickOutside = (event: any) => {
       if (ref.current && !ref.current.contains(event.target)) {

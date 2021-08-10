@@ -1,11 +1,13 @@
-import React, {useEffect, useState, useRef, useLayoutEffect } from 'react'
+import {useEffect, useState, useRef, useLayoutEffect } from 'react'
 import Reactors from '../Reactors'
-import Tabs from '../ui/Tabs'
 import { getContentReactorsByReaction } from '../../shared/Reactions/ReactionsApi';
-import { UiSummary, TabPanel } from './styles';
+import { UiSummary } from './styles';
 import useOutsideChecker from '../../hooks/UseOutsideChecker';
 import { TReaction, TReactions } from '../../shared/Reactions/TReactions';
 import { TStringOrNumber } from '../../shared/common/TCommon';
+import ReactionTabs from './ReactionTabs';
+import TabPanel from '../ui/Tabs/TabPanel';
+import Spinner from '../ui/Spinner';
 
 type TSummaryReaction = {
   postId: TStringOrNumber,
@@ -20,6 +22,7 @@ const SummaryReactions = ({postId, activeTab, tabList, onClose, shouldShow, ...p
     [reactors, setReactors] = useState<any>({}),
     [tabs, setTabs] = useState(tabList),
     [top, setTop] = useState(0),
+    [isLoading, setIsLoading] = useState(false),
     targetRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -40,11 +43,16 @@ const SummaryReactions = ({postId, activeTab, tabList, onClose, shouldShow, ...p
       })
     }
 
-
     if (currentTabReactors && !currentTabReactors.length) {
+      setIsLoading(true);
       getContentReactorsByReaction(postId, currentTab).then((res) => {
         if(targetRef.current) {
           successgetContentReactorsCallback(res, currentTabReactors);
+          setIsLoading(false);
+        }
+      }).catch(() => {
+        if(targetRef.current) {
+          setIsLoading(false);
         }
       })
     }
@@ -72,9 +80,9 @@ const SummaryReactions = ({postId, activeTab, tabList, onClose, shouldShow, ...p
     {shouldShow && 
       <UiSummary {...props} ref={targetRef} position={top + 'px'}>
         <h4>Reactions</h4>
-        <Tabs tabs={tabs} activeTab={currentTab} handleOnTabClick={handleOnTabClick}/>
+        <ReactionTabs tabs={tabs} activeTab={currentTab} handleOnTabClick={handleOnTabClick}/>
         <TabPanel>
-          <Reactors reactors={reactors[currentTab]}/>
+          {isLoading ? <Spinner /> : <Reactors reactors={reactors[currentTab]}/>}
         </TabPanel>
       </UiSummary>
     }

@@ -6,6 +6,9 @@ const currentUserId = 4,
   GET_ALL_USERS = '/users';
 
 
+/**
+ * Get User info
+ */
 export const getUserInfo = () => {
   return (dispatch: Dispatch) => {
     const currentUserPromise = getCurrentUser(),
@@ -17,10 +20,16 @@ export const getUserInfo = () => {
   }
 }
 
+/**
+ * Get current user
+ */
 export const getCurrentUser = () => {  
   return Server.get(`${GET_ALL_USERS}/${currentUserId}`);
 }
 
+/**
+ * Get all Users
+ */
 export const getAllUsers = () => {
   return Server.get(`${GET_ALL_USERS}`)
 }
