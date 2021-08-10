@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { UiAddReaction } from './styles';
 import SummaryReactions from '../SummaryReactions';
 import SelectedReactions from './SelectedReactions';
@@ -103,20 +103,13 @@ const AddReactions = ({ postId, reactions }: TAddReactions) => {
     setShowSummary(false);
   }
 
-  const memoizedCallback = useCallback(
-    () => {
-      handleOnEmojiMouseDown()
-    },
-    [],
-  )
-
   useOutsideHoverCheck(uiAddReactionRef, handleOnEmojiMouseDown);
 
   return (
     <UiAddReaction ref={uiAddReactionRef}>
        {showSummary && <SummaryReactions 
         shouldShow={showSummary}
-        onClose={memoizedCallback}
+        onClose={handleOnEmojiMouseDown}
         tabList={selectedReactions}
         activeTab={activeTab} postId={postId}/>
        }

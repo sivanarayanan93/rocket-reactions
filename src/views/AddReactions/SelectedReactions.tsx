@@ -21,7 +21,7 @@ const SelectedReactions = ({reactions, handleOnEmojiClick, handleOnEmojiHover, h
           key={reaction.id}
           data-reaction-emoji={reaction.emoji}
           data-reaction-id={reaction.id}>
-          {reaction.emoji && reaction.emoji.trim()}<label className="emoji-count">{reaction.count}</label>
+          {reaction.emoji}<label className="emoji-count">{reaction.count}</label>
         </EmojiIcon>
       })}
     </div>

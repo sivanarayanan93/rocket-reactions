@@ -22,15 +22,20 @@ const ReactionTrigger = ({ isOpen, onTrigger,  onClose, reactions, handleOnEmoji
   }
   return (
     <>
-    <ReactionsPoup 
-      left={left}
-      isOpen={isOpen}
-      onClose={onClose}
-      reactions={reactions}
-      handleOnEmojiClick={handleOnEmojiClick} 
-    />
-    
-    <Button onClick={handleOntrigger}/>
+      <Button 
+        aria-haspopup="true"
+        aria-expanded="false"
+        data-toggle="dropdown"
+        onClick={handleOntrigger} style ={{ fontWeight: '600'}}>
+        R
+      </Button>
+      <ReactionsPoup 
+        left={left}
+        isOpen={isOpen}
+        onClose={onClose}
+        reactions={reactions}
+        handleOnEmojiClick={handleOnEmojiClick} 
+      />
     </>
   )
 }

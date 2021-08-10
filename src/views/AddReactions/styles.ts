@@ -13,11 +13,6 @@ export const UiAddReaction = styled.div`
 
   .added-reactions {
     line-height: 40px;
-
-    span {
-      margin-right: 8px;
-      padding: 6px 7px;
-    }
   }
 `
 
@@ -27,14 +22,17 @@ export const UiReactionsPopup = styled.div<TUiReactionsPopup>`
   border-radius: 24px;
   box-shadow: 0px 1px 2px 1px lightgray;
   position: absolute;
-  top: -30px;
+  top: -38px;
   left: ${props =>`${props.left}px`};
   display: flex;
   align-items: center;
-  padding: 0 8px;
+  padding: 4px 8px;
 
-  span {
+  button {
+    min-height: 32px;
+
     :hover {
+      background: transparent;
       font-size: 32px;
       display: block;
       padding-bottom: 8px;

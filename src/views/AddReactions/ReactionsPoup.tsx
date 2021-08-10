@@ -36,14 +36,16 @@ const ReactionsPoup = ({ reactions, handleOnEmojiClick, isOpen, onClose, left}: 
       {isOpen && <UiReactionsPopup left={left} ref={poupRef}>
         {reactions && reactions.map((reaction) => (
           <span key={reaction.id}>
-          <EmojiIcon onClick={() => handleOnClick(reaction)}
-            data-reaction-emoji={reaction.emoji} 
-            data-reaction-id={reaction.id} 
-            data-for="reactions" 
-            data-tip={reaction.name}>
-            {reaction.emoji}
-          </EmojiIcon>
-          <ReactTooltip className="react-tooltip" id="reactions" place="top" effect="solid"/>
+            <EmojiIcon onClick={() => handleOnClick(reaction)}
+              data-reaction-emoji={reaction.emoji} 
+              aria-haspopup="true"
+              tabIndex={0}
+              data-reaction-id={reaction.id} 
+              data-for="reactions" 
+              data-tip={reaction.name}>
+              {reaction.emoji}
+            </EmojiIcon>
+            <ReactTooltip className="react-tooltip" id="reactions" place="top" effect="solid"/>
           </span>
         ))}
       </UiReactionsPopup>

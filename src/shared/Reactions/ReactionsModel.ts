@@ -73,10 +73,14 @@ export const getUpdatedReactions = (reactions: TReactions, reactionPayload: any,
    reaction = tempReactions[index],
    emoji = reaction ? reaction.emoji : reactionPayload.emoji;
 
+   if (!shouldAddReaction && reaction.count <= 1) {
+    return reactions.filter(item => item.id !== reactionId);
+  }
+
    const getTempReactions = () => {
       tempReactions[index] = {
         ...reaction,
-        count: shouldAddReaction ? reaction.count + 1 : reaction.count -1,
+        count: shouldAddReaction ? reaction.count + 1 : reaction.count - 1,
         isReactedByCurrentUser: shouldAddReaction,
         contentReactionId: contentReactionId 
       }
@@ -89,13 +93,13 @@ export const getUpdatedReactions = (reactions: TReactions, reactionPayload: any,
    if (reaction) {
     updatedReactions = getTempReactions();
    } else {
-    updatedReactions = shouldAddReaction ?  [...reactions,
+    updatedReactions = [...reactions,
       { id: reactionId,
         contentReactionId: contentReactionId,
         emoji,
         count: 1,
         isReactedByCurrentUser: true
-    }] : reactions.filter(item => item.id !== reactionId);
+    }];
   }
 
    return updatedReactions;

@@ -15,16 +15,19 @@ const Tabs = ({tabs, activeTab, handleOnTabClick}: TTabs) => {
   return (
     <UiTabs>
       {tabs && tabs.map((tab) => (
-        <Tab onClick={e => handleOnTabClick(tab.id, e)} data-tab-id={tab.id} data-tab-active-id={activeTab} isActive={String(activeTab) === String(tab.id)} key={`tab_${tab.id}`}>
-          <EmojiIcon>
-            {tab.emoji}
-            {tab.count && <>
-              <label className="emoji-count">.</label>
-              <label className="emoji-count">{tab.count}</label>
-            </>
-            }
-          </EmojiIcon>
-        </Tab>
+        <>
+          <Tab onClick={e => handleOnTabClick(tab.id, e)} data-tab-id={tab.id} data-tab-active-id={activeTab} isActive={String(activeTab) === String(tab.id)} key={`tab_${tab.id}`}>
+            <EmojiIcon>
+              {tab.emoji}
+              {tab.count && 
+                <>
+                  <span className="emoji-count">.</span>
+                  <span className="emoji-count">{tab.count}</span>
+                </>
+              }
+            </EmojiIcon>
+          </Tab>
+        </>
       ))}
     </UiTabs>
   )

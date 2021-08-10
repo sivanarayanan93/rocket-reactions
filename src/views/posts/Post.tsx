@@ -8,7 +8,6 @@ const PostWrapper = styled.div`
   border-radius: 8px;
   padding: 14px 24px 10px 24px;
   margin: 10px 0;
-  width: 100%;
 `;
 
 const Content = styled.div`

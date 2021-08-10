@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import Avator from '../ui/Avator';
+import Avatar from '../ui/Avatar';
 import EmojiIcon from '../ui/EmojiIcon';
 import { IReactor } from '../../shared/Reactions/TReactions';
 
@@ -12,7 +12,7 @@ const UiReactor = styled.div`
 const Reactor = ({reactor}: { reactor: IReactor}) => {
   return (
     <UiReactor>
-      <Avator url={reactor.avatar}/>
+      <Avatar url={reactor.avatar}/>
       <EmojiIcon> {reactor.emoji} </EmojiIcon>
       <div>{reactor.first_name} {reactor.last_name}</div>
     </UiReactor>

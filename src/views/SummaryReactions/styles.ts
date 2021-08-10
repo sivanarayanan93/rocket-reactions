@@ -12,14 +12,16 @@ export const UiSummary = styled.div<TUiSummary>`
   font-size: 14px;
   font-weight: 600;
   position: absolute;
+  min-width: 300px;
   top: ${props => `${props.position}`};
   z-index: 999;
 
-  h3 {
+  h4 {
     padding: 0 16px;
+    margin-bottom: 0;
   }
 `
 export const TabPanel = styled.div`
-  height: 210px;
+  height: 224px;
   overflow-y: auto;
 `

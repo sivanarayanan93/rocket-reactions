@@ -23,7 +23,7 @@ const SummaryReactions = ({postId, activeTab, tabList, onClose, shouldShow, ...p
     targetRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setTabs([...[{id: 'ALL', emoji: 'ALL'} as TReaction], ...tabList]);
+    setTabs([...[{id: 'ALL', emoji: 'All'} as TReaction], ...tabList]);
   }, [tabList]);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const SummaryReactions = ({postId, activeTab, tabList, onClose, shouldShow, ...p
     <>
     {shouldShow && 
       <UiSummary {...props} ref={targetRef} position={top + 'px'}>
-        <h3>Reactions</h3>
+        <h4>Reactions</h4>
         <Tabs tabs={tabs} activeTab={currentTab} handleOnTabClick={handleOnTabClick}/>
         <TabPanel>
           <Reactors reactors={reactors[currentTab]}/>
