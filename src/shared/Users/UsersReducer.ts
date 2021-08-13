@@ -1,20 +1,17 @@
+import { TAction } from "../common/TCommon";
 import { TUser, TUsersReducer } from "./TUsers"
+import { ACTION_TYPES } from "./UserModel";
 
 const initState:TUsersReducer = {
   currentUser: {} as TUser,
   reactions: []
 }
 
-type TAction = {
-  type: string,
-  payload: {
-    [key: string]: any
-  }
-}
+const { ADD_USER_INFO } = ACTION_TYPES;
 
 const UserReducer = (state:TUsersReducer = initState, action:TAction) => {
   switch(action.type) {
-    case "ADD_USER_INFO":
+    case ADD_USER_INFO:
       return { ...state,
         currentUser: action.payload.user, reactions: [...state.reactions, ...action.payload.reactions]
       }
