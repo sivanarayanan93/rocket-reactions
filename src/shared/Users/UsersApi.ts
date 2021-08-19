@@ -18,7 +18,7 @@ export const getUserInfo = () => {
     Promise.all([allUsersPromise, recationsPromise]).then((res) => {
       const currentUser = res[0].data ? res[0].data.find((user: TUser) => user.id === CONSTANTS.CURRENT_USER_ID) : {};
       
-      dispatch({type: ADD_USER_INFO, payload: { users: res[0].data, currentUser, reactions: res[1].data}});    
+      dispatch({type: ADD_USER_INFO, payload: { users: res[0].data, currentUser, reactions: res[1].data}});
     })
   }
 }

@@ -15,7 +15,8 @@ export const API_URL = {
 export const getSelelcedReactions = (data: any) => {
   const selectedReactionsTemp: TReactions = [],
     allReactions = getReactionsFromStore(),
-    allUsers = getAllUsersFromStore();
+    allUsers = getAllUsersFromStore(),
+    currentUser = getCurrentUserFromStore();
 
   for(let postReaction of data) {
     const reactionId = postReaction.reaction_id,
@@ -26,18 +27,16 @@ export const getSelelcedReactions = (data: any) => {
     if(index >= 0) {
       if(selectedReactionsTemp[index]) {
         selectedReactionsTemp[index].count += 1;
-        selectedReactionsTemp[index].contentReactionId = postReaction.id
+         
 
         if (user) {
           selectedReactionsTemp[index].users.push(user);
+          if (!selectedReactionsTemp[index].contentReactionId && user.id === currentUser.id) {
+            selectedReactionsTemp[index].contentReactionId = postReaction.id;
+          }
         }
       }
 
-      // Finding if a reaction added by the current user
-      // if (!selectedReactionsTemp[index].isReactedByCurrentUser && isReactedByCurrentUser) {
-      //   selectedReactionsTemp[index].isReactedByCurrentUser = isReactedByCurrentUser;
-      //   selectedReactionsTemp[index].contentReactionId = postReaction.id;
-      // }
     } else {
       const reaction = allReactions.find(item => item.id === reactionId);
 
@@ -45,7 +44,7 @@ export const getSelelcedReactions = (data: any) => {
         id: reactionId,
         users: user ? [user] : [],
         emoji: reaction && reaction.emoji,
-        contentReactionId: postReaction.id,
+        contentReactionId: user && user.id === currentUser.id ? postReaction.id : null,
         count: 1
       })
     }
@@ -103,7 +102,7 @@ export const getUpdatedReactions = (reactions: TReactions, reactionPayload: any,
         ...reaction,
         count: shouldAddReaction ? reaction.count + 1 : reaction.count - 1,
         users: shouldAddReaction ? [...reaction.users, currentUser] : reaction.users.filter(item => item.id !== currentUser.id),
-        contentReactionId
+        contentReactionId: shouldAddReaction ? contentReactionId : null
       }
 
       return tempReactions;
@@ -118,7 +117,7 @@ export const getUpdatedReactions = (reactions: TReactions, reactionPayload: any,
     updatedReactions = [...reactions,
       {
         id: reactionId,
-        users: [],
+        users: [{ ...currentUser}],
         emoji,
         contentReactionId: contentReactionId,
         count: 1

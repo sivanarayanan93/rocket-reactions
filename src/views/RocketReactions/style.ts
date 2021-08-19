@@ -26,21 +26,29 @@ export const UiReactionsPickerTriggerPopup = styled.div<TUiReactionsPopup>`
   border-radius: 24px;
   box-shadow: 0px 1px 2px 1px lightgray;
   position: absolute;
-  top: -50px;
+  top: -40px;
   left: ${props =>`${props.left}px`};
   display: flex;
   align-items: center;
-  padding: 4px 8px;
+  padding: 0 8px;
+
+  span {
+    padding: 8px;
+    display: flex;
+    align-items: center;
+  }
 
   button {
-    min-height: 32px;
+    min-width: auto;
+    padding: 0 .5px;
+    max-height: 16px;
+    display: flex;
+    align-items: center;
 
     :hover {
       background: transparent;
-      display: block;
-      padding-bottom: 8px;
       transform: scale(2);
-      transform-origin: 15px 15px;
+      transform-origin: 8px 16px;
     }
   }
 `;

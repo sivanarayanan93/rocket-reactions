@@ -4,7 +4,7 @@ import { TReactions } from '../../shared/Reactions/TReactions';
 import COLORS from '../../shared/colors';
 import ReactionsPicker from '../RocketReactions/views/ReactionsPicker';
 import { addReaction, deleteReaction, getReactionsByPost } from '../../shared/Reactions/ReactionsApi';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { TReducers } from '../../reducers';
 import { getUpdatedReactions } from '../../shared/Reactions/ReactionsModel';
@@ -26,62 +26,93 @@ const Content = styled.div`
   margin-top: 10px;
 `
 
+const initPromise = {
+  promise: null
+}
+
 const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
 
   const [reactionsSummary, setReactionsSummary ] = useState<any[]>([]),
-    currentUser = useSelector<TReducers, TReducers["User"]["currentUser"]>(state => state.User.currentUser);
+    currentUser = useSelector<TReducers, TReducers["User"]["currentUser"]>(state => state.User.currentUser),
+    [selectedReaction, setSelectedReaction] = useState<any>({}),
+    lastAddReactionPromise = useRef({...initPromise}),
+    lastRemoveReactionPromise = useRef({...initPromise});
 
 
-  useEffect(() => {    
-    getReactionsByPost(post.id).then((res) => {
-      successSelectedReactionsCallback(res as TReactions);
-    })
+  useEffect(() => {
+    if (post && post.id) {
+      getReactionsByPost(post.id).then((res) => {
+        successSelectedReactionsCallback(res as TReactions);
+      })
+    }    
   }, [post]);
+
+  useEffect(() => {
+    if (selectedReaction && selectedReaction.id && !selectedReaction.contentReactionId) {
+      if (!lastAddReactionPromise.current.promise) {
+        const {id, contentId, userId, emoji} = selectedReaction;
+        let currentPromise = addReaction({id, contentId, userId});
+        lastAddReactionPromise.current.promise = currentPromise;
+
+        currentPromise.then((res) => {
+          if (lastAddReactionPromise.current.promise === currentPromise) {
+            successReactionCallback({id, emoji, contentReactionId: res.data.id}, true);
+            lastAddReactionPromise.current = {...initPromise};
+          }
+        }).catch(() => {
+          if (lastAddReactionPromise.current.promise === currentPromise) {
+            setSelectedReaction({});
+            lastAddReactionPromise.current = { ...initPromise };
+          }
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedReaction, lastAddReactionPromise.current.promise])
+
+  useEffect(() => {
+    if (selectedReaction && selectedReaction.contentReactionId) {
+      if (!lastRemoveReactionPromise.current.promise) {
+        const { id,  emoji, contentReactionId } = selectedReaction;
+        let currentPromise = deleteReaction(contentReactionId);
+
+        lastRemoveReactionPromise.current.promise = currentPromise;
+
+        currentPromise.then((res) => {
+          if (lastRemoveReactionPromise.current.promise === currentPromise) {
+            successReactionCallback({ id,  emoji, contentReactionId });
+            lastRemoveReactionPromise.current = {...initPromise};
+          }
+        }).catch((res) => {
+          if (lastRemoveReactionPromise.current.promise === currentPromise) {
+            setSelectedReaction({});
+            lastRemoveReactionPromise.current = { ...initPromise };
+          }
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedReaction, lastRemoveReactionPromise.current.promise])
 
   const onSelectReaction = (reaction: any) => {
 
-    const currentReaction = reactionsSummary.find((item: any) => item.id === reaction.id);
-    let isReactedByCurrentUser = false;
+    const currentReaction = reactionsSummary.find((item: any) => item.id === reaction.id) || reaction;
+    // let isReactedByCurrentUser = false;
 
-    if (currentReaction && currentReaction.users) {
-      let index = currentReaction.users.findIndex((item: any) => item.id === currentUser.id);
+    // if (currentReaction && currentReaction.users) {
+    //   let index = currentReaction.users.findIndex((item: any) => item.id === currentUser.id);
       
-      isReactedByCurrentUser = index >= 0;
-    }
+    //   isReactedByCurrentUser = index >= 0;
+    // }
 
-    if(isReactedByCurrentUser) {
-      removeReaction({id: currentReaction.id, emoji: currentReaction.emoji, contentReactionId: currentReaction.contentReactionId})
-    } else {
-      const postData = {id: currentReaction.id, emoji: currentReaction.emoji, contentId: post.id, userId: currentUser.id};
-      postReaction(postData)
-    }    
-  }
-
-  const removeReaction = (data: any) => {
-    const {id, emoji, contentReactionId} = data;
-
-    deleteReaction(contentReactionId).then((res) => {
-      const payload = {id, emoji, contentReactionId};
-
-      successReactionCallback(payload);
-    });
-  }
-
-  const postReaction = (data: any) => {
-    const {id, emoji, contentId, userId } = data;
-
-    addReaction({id, contentId, userId}).then((res) => {
-      const contentReactionId = res.data.id,
-        payload = {id, emoji, contentReactionId};
-
-        successReactionCallback(payload, true);
-    })
+    setSelectedReaction({...currentReaction, contentId: post.id, userId: currentUser.id})
   }
 
   const successReactionCallback = (payload: any, shouldAddRection = false) => {
     const updatedReactions = getUpdatedReactions(reactionsSummary, payload, shouldAddRection);
     
     setReactionsSummary(updatedReactions);
+    setSelectedReaction({});
   }
 
   const successSelectedReactionsCallback = (response: TReactions) => {
@@ -94,8 +125,7 @@ const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
   return (
     <PostWrapper>
         <Content>{ post.content } - {post.id}</Content> 
-        {/* <ReactionsPicker summary={reactionsSummary} user={currentUser} onSelect={onSelectReaction} reactions={reactions}/> */}
-        <ReactionsPicker summary={reactionsSummary} onSelect={onSelectReaction} reactions={reactions}/>
+        <ReactionsPicker summary={reactionsSummary} user={currentUser} onSelect={onSelectReaction} reactions={reactions}/>
     </PostWrapper>
   )
 }
