@@ -12,3 +12,8 @@ export const getCurrentUserFromStore = () => {
   const state = getAppState();
   return state ? state.User.currentUser : {};
 }
+
+export const getAllUsersFromStore = () => {
+  const state = getAppState();
+  return state ? state.User.users : [];  
+}

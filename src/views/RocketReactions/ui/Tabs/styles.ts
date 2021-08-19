@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import COLORS from '../../../shared/colors';
+import COLORS from '../../../../shared/colors';
 
 const { LIGHT_GRAY, PRIMARY_BLUE } = COLORS;
 

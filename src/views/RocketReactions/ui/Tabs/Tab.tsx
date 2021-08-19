@@ -1,11 +1,12 @@
 import React from 'react';
-import { TStringOrNumber } from '../../../shared/common/TCommon';
+import { TStringOrNumber } from '../../../../shared/common/TCommon';
 import { UiTab } from './styles';
 
 export type TTab = {
   id: TStringOrNumber,
   isActive: boolean,
-  children: React.ReactNode
+  children: React.ReactNode,
+  onClick: () => void
 }
 
 const Tab = ({id, children, isActive, ...props}: TTab) => {

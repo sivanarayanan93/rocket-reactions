@@ -6,9 +6,10 @@ export type TReaction = {
   name?: string,
   emoji: string | undefined,
   count: number,
-  isReactedByCurrentUser: boolean,
+  isReactedByCurrentUser?: boolean,
   userId?: TStringOrNumber | undefined,
   contentReactionId?: TStringOrNumber
+  users: TUser[]
 }
 
 export type TReactions = TReaction[];

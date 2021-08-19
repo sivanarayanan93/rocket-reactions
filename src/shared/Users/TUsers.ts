@@ -11,5 +11,6 @@ export type TUser = {
 
 export type TUsersReducer = {
   currentUser:  TUser,
+  users:  TUser[],
   reactions: TReactions
 }
