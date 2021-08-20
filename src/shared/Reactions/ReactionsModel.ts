@@ -23,6 +23,9 @@ export const getSelelcedReactions = (data: any) => {
       index = selectedReactionsTemp.findIndex(reaction => reaction.id === reactionId),
       user = allUsers.find(user => user.id === postReaction.user_id);
 
+    if (user) {
+      user.name = `${user.first_name} ${user.last_name}`;
+    }
     // Finding total count of reactions
     if(index >= 0) {
       if(selectedReactionsTemp[index]) {
@@ -43,7 +46,7 @@ export const getSelelcedReactions = (data: any) => {
       selectedReactionsTemp.push({
         id: reactionId,
         users: user ? [user] : [],
-        emoji: reaction && reaction.emoji,
+        emoji: reaction && String(reaction.name).toLowerCase(),
         contentReactionId: user && user.id === currentUser.id ? postReaction.id : null,
         count: 1
       })

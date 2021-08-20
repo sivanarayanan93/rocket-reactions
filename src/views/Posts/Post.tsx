@@ -2,12 +2,12 @@ import styled from 'styled-components';
 import { TPost } from '../../shared/Posts/TPosts';
 import { TReactions } from '../../shared/Reactions/TReactions';
 import COLORS from '../../shared/colors';
-import ReactionsPicker from '../RocketReactions/views/ReactionsPicker';
 import { addReaction, deleteReaction, getReactionsByPost } from '../../shared/Reactions/ReactionsApi';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { TReducers } from '../../reducers';
 import { getUpdatedReactions } from '../../shared/Reactions/ReactionsModel';
+import { RocketReactions } from '@sivanarayanan93/rocket-reactions';
 
 const PostWrapper = styled.div`
   background-color: ${COLORS.WHITE};
@@ -38,6 +38,10 @@ const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
     lastAddReactionPromise = useRef({...initPromise}),
     lastRemoveReactionPromise = useRef({...initPromise});
 
+  const memoizedReactions = useMemo(() => {
+    return reactions && reactions.map(item => item.name)
+  }, [reactions]);
+
 
   useEffect(() => {
     if (post && post.id) {
@@ -46,6 +50,10 @@ const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
       })
     }    
   }, [post]);
+
+  const memoizedReactionSummary = useMemo(() => {
+    return reactionsSummary && reactionsSummary.map(item => ({ emoji: item.emoji, users: item.users}));
+  }, [reactionsSummary])
 
   useEffect(() => {
     if (selectedReaction && selectedReaction.id && !selectedReaction.contentReactionId) {
@@ -94,16 +102,9 @@ const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedReaction, lastRemoveReactionPromise.current.promise])
 
-  const onSelectReaction = (reaction: any) => {
+  const onSelectReaction = (emoji: any) => {
 
-    const currentReaction = reactionsSummary.find((item: any) => item.id === reaction.id) || reaction;
-    // let isReactedByCurrentUser = false;
-
-    // if (currentReaction && currentReaction.users) {
-    //   let index = currentReaction.users.findIndex((item: any) => item.id === currentUser.id);
-      
-    //   isReactedByCurrentUser = index >= 0;
-    // }
+    const currentReaction = reactionsSummary.find((item: any) => item.emoji === emoji) || reactions.find(item => item.emoji === emoji);
 
     setSelectedReaction({...currentReaction, contentId: post.id, userId: currentUser.id})
   }
@@ -124,8 +125,13 @@ const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
 
   return (
     <PostWrapper>
-        <Content>{ post.content } - {post.id}</Content> 
-        <ReactionsPicker summary={reactionsSummary} user={currentUser} onSelect={onSelectReaction} reactions={reactions}/>
+        <Content>{ post.content } - {post.id}</Content>
+
+        <RocketReactions summary={memoizedReactionSummary} onSelect={onSelectReaction} userId={currentUser.id} reactions={memoizedReactions} />
+
+        {/* <ReactionsSummary summary={memoizedReactionSummary} user={currentUser} onSelect={onSelectReaction}/>
+        <ReactionsPicker onSelect={onSelectReaction} reactions={memoizedReactions}/> */}
+        
     </PostWrapper>
   )
 }
