@@ -1,38 +1,35 @@
 import Server from '../server';
-import { Dispatch } from 'redux';
-import { getReactions } from '../Reactions/ReactionsApi';
-import { ACTION_TYPES, API_URL, CONSTANTS } from './UserModel';
 import { TUser } from './TUsers';
+import { API_URL, CONSTANTS } from './UserModel';
 
-const { ADD_USER_INFO } = ACTION_TYPES,
-  { GET_ALL_USERS } = API_URL;
-
-/**
- * Get User info
- */
-export const getUserInfo = () => {
-  return (dispatch: Dispatch) => {
-    const allUsersPromise = getAllUsers(),
-    recationsPromise = getReactions();
-
-    Promise.all([allUsersPromise, recationsPromise]).then((res) => {
-      const currentUser = res[0].data ? res[0].data.find((user: TUser) => user.id === CONSTANTS.CURRENT_USER_ID) : {};
-      
-      dispatch({type: ADD_USER_INFO, payload: { users: res[0].data, currentUser, reactions: res[1].data}});
-    })
-  }
-}
-
-/**
- * Get current user
- */
-export const getCurrentUser = () => {  
-  return Server.get(`${GET_ALL_USERS}/${CONSTANTS.CURRENT_USER_ID}`);
-}
+const { GET_ALL_USERS } = API_URL;
 
 /**
  * Get all Users
  */
 export const getAllUsers = () => {
   return Server.get(`${GET_ALL_USERS}`)
+}
+
+/**
+ * Get User info
+ */
+export const getUserInfo = async() => { 
+  try {
+    const res = await getAllUsers();
+
+    if (res && res.data) {
+      let users = res.data;
+
+      users.forEach((user: TUser) => {
+        user.name = `${user.first_name} ${user.last_name}`
+      });
+
+      const currentUser = res.data.find((user: TUser) => user.id === CONSTANTS.CURRENT_USER_ID);
+      
+      return { users, currentUser };
+    }
+  } catch(err) {
+    return { users: [], currentUser: {}, error: err}
+  }
 }

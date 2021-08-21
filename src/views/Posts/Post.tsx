@@ -3,11 +3,10 @@ import { TPost } from '../../shared/Posts/TPosts';
 import { TReactions } from '../../shared/Reactions/TReactions';
 import COLORS from '../../shared/colors';
 import { addReaction, deleteReaction, getReactionsByPost } from '../../shared/Reactions/ReactionsApi';
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { TReducers } from '../../reducers';
-import { getUpdatedReactions } from '../../shared/Reactions/ReactionsModel';
-import { RocketReactions } from '@sivanarayanan93/rocket-reactions';
+import { useState, useEffect, useRef, useMemo, useContext } from 'react';
+import {AppContext } from '../../App';
+import { getSelelcedReactions, getUpdatedReactions } from '../../shared/Reactions/ReactionsModel';
+import  RocketReactions  from '../RocketReactions';
 
 const PostWrapper = styled.div`
   background-color: ${COLORS.WHITE};
@@ -26,30 +25,29 @@ const Content = styled.div`
   margin-top: 10px;
 `
 
-const initPromise = {
-  promise: null
-}
-
 const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
 
   const [reactionsSummary, setReactionsSummary ] = useState<any[]>([]),
-    currentUser = useSelector<TReducers, TReducers["User"]["currentUser"]>(state => state.User.currentUser),
+    { users, currentUser } = useContext(AppContext),
     [selectedReaction, setSelectedReaction] = useState<any>({}),
-    lastAddReactionPromise = useRef({...initPromise}),
-    lastRemoveReactionPromise = useRef({...initPromise});
+    lastAddReactionPromise = useRef<any>(null),
+    lastRemoveReactionPromise = useRef<any>(null);
 
   const memoizedReactions = useMemo(() => {
-    return reactions && reactions.map(item => item.name)
+    return reactions && reactions.map(item => item.name) as any
   }, [reactions]);
 
 
   useEffect(() => {
-    if (post && post.id) {
-      getReactionsByPost(post.id).then((res) => {
-        successSelectedReactionsCallback(res as TReactions);
+    if (post && post.id && reactions.length) {
+      getReactionsByPost(post.id).then((res: any) => {
+        if (res.length) {
+          successSelectedReactionsCallback(res);
+        }
       })
-    }    
-  }, [post]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post, reactions]);
 
   const memoizedReactionSummary = useMemo(() => {
     return reactionsSummary && reactionsSummary.map(item => ({ emoji: item.emoji, users: item.users}));
@@ -57,81 +55,80 @@ const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
 
   useEffect(() => {
     if (selectedReaction && selectedReaction.id && !selectedReaction.contentReactionId) {
-      if (!lastAddReactionPromise.current.promise) {
+      if (!lastAddReactionPromise.current) {
         const {id, contentId, userId, emoji} = selectedReaction;
         let currentPromise = addReaction({id, contentId, userId});
-        lastAddReactionPromise.current.promise = currentPromise;
+        lastAddReactionPromise.current = currentPromise;
 
         currentPromise.then((res) => {
-          if (lastAddReactionPromise.current.promise === currentPromise) {
-            successReactionCallback({id, emoji, contentReactionId: res.data.id}, true);
-            lastAddReactionPromise.current = {...initPromise};
+          if (lastAddReactionPromise.current === currentPromise) {
+            successReactionCallback({id, emoji, contentReactionId: res.data && res.data.id}, true);
+            lastAddReactionPromise.current = null;
           }
         }).catch(() => {
-          if (lastAddReactionPromise.current.promise === currentPromise) {
+          if (lastAddReactionPromise.current === currentPromise) {
             setSelectedReaction({});
-            lastAddReactionPromise.current = { ...initPromise };
+            lastAddReactionPromise.current = null;
           }
         });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedReaction, lastAddReactionPromise.current.promise])
+  }, [selectedReaction, lastAddReactionPromise.current])
 
   useEffect(() => {
     if (selectedReaction && selectedReaction.contentReactionId) {
-      if (!lastRemoveReactionPromise.current.promise) {
+      if (!lastRemoveReactionPromise.current) {
         const { id,  emoji, contentReactionId } = selectedReaction;
         let currentPromise = deleteReaction(contentReactionId);
 
-        lastRemoveReactionPromise.current.promise = currentPromise;
+        lastRemoveReactionPromise.current = currentPromise;
 
         currentPromise.then((res) => {
-          if (lastRemoveReactionPromise.current.promise === currentPromise) {
+          if (lastRemoveReactionPromise.current === currentPromise) {
             successReactionCallback({ id,  emoji, contentReactionId });
-            lastRemoveReactionPromise.current = {...initPromise};
+            lastRemoveReactionPromise.current = null;
           }
         }).catch((res) => {
-          if (lastRemoveReactionPromise.current.promise === currentPromise) {
+          if (lastRemoveReactionPromise.current === currentPromise) {
             setSelectedReaction({});
-            lastRemoveReactionPromise.current = { ...initPromise };
+            lastRemoveReactionPromise.current = null;
           }
         });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedReaction, lastRemoveReactionPromise.current.promise])
+  }, [selectedReaction, lastRemoveReactionPromise.current])
 
   const onSelectReaction = (emoji: any) => {
 
-    const currentReaction = reactionsSummary.find((item: any) => item.emoji === emoji) || reactions.find(item => item.emoji === emoji);
+    let currentReaction = reactionsSummary.find((item: any) => item.emoji === emoji);
+    
+    if (!currentReaction) {
+      currentReaction = reactions.find(item => String(item.name).toLowerCase() === emoji);
+      currentReaction.emoji = emoji;
+    }
 
     setSelectedReaction({...currentReaction, contentId: post.id, userId: currentUser.id})
   }
 
   const successReactionCallback = (payload: any, shouldAddRection = false) => {
-    const updatedReactions = getUpdatedReactions(reactionsSummary, payload, shouldAddRection);
+    const updatedReactions = getUpdatedReactions(reactionsSummary, payload, shouldAddRection, currentUser);
     
     setReactionsSummary(updatedReactions);
     setSelectedReaction({});
   }
 
   const successSelectedReactionsCallback = (response: TReactions) => {
-    setReactionsSummary(prevState => [
-      ...prevState,
-      ...response
-    ]);
+    const selectedReactions = getSelelcedReactions(response, {users, currentUser, reactions});
+    
+    setReactionsSummary(selectedReactions);
   } 
 
   return (
     <PostWrapper>
-        <Content>{ post.content } - {post.id}</Content>
-
-        <RocketReactions summary={memoizedReactionSummary} onSelect={onSelectReaction} userId={currentUser.id} reactions={memoizedReactions} />
-
-        {/* <ReactionsSummary summary={memoizedReactionSummary} user={currentUser} onSelect={onSelectReaction}/>
-        <ReactionsPicker onSelect={onSelectReaction} reactions={memoizedReactions}/> */}
-        
+      <Content>{ post.content } - {post.id}</Content>
+      {reactions.length > 0 && <RocketReactions summary={memoizedReactionSummary} onSelect={onSelectReaction} userId={currentUser && currentUser.id} reactions={memoizedReactions} />}
     </PostWrapper>
   )
 }

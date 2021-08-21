@@ -3,12 +3,12 @@ import { TUser } from "../Users/TUsers";
 
 export type TReaction = {
   id?: string,
-  emoji: string | undefined,
+  emoji: string,
   count?: number,
   isReactedByCurrentUser?: boolean,
   userId?: TStringOrNumber | undefined,
   contentReactionId?: TStringOrNumber
-  users?: TUser[],
+  users: TUser[],
   name?: string
 }
 
