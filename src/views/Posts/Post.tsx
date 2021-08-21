@@ -6,7 +6,8 @@ import { addReaction, deleteReaction, getReactionsByPost } from '../../shared/Re
 import { useState, useEffect, useRef, useMemo, useContext } from 'react';
 import {AppContext } from '../../App';
 import { getSelelcedReactions, getUpdatedReactions } from '../../shared/Reactions/ReactionsModel';
-import  RocketReactions  from '../RocketReactions';
+import { RocketReactions } from '@sivanarayanan93/rocket-reactions';
+import {debounce} from 'lodash';
 
 const PostWrapper = styled.div`
   background-color: ${COLORS.WHITE};
@@ -30,8 +31,7 @@ const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
   const [reactionsSummary, setReactionsSummary ] = useState<any[]>([]),
     { users, currentUser } = useContext(AppContext),
     [selectedReaction, setSelectedReaction] = useState<any>({}),
-    lastAddReactionPromise = useRef<any>(null),
-    lastRemoveReactionPromise = useRef<any>(null);
+    lastAddReactionPromise = useRef<any>(null);
 
   const memoizedReactions = useMemo(() => {
     return reactions && reactions.map(item => item.name) as any
@@ -54,53 +54,30 @@ const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
   }, [reactionsSummary])
 
   useEffect(() => {
-    if (selectedReaction && selectedReaction.id && !selectedReaction.contentReactionId) {
-      if (!lastAddReactionPromise.current) {
-        const {id, contentId, userId, emoji} = selectedReaction;
-        let currentPromise = addReaction({id, contentId, userId});
+
+    const reactionId = selectedReaction && selectedReaction.id;
+
+    if (reactionId && selectedReaction.id && !lastAddReactionPromise.current) {
+        const {id, contentId, userId, contentReactionId, emoji} = selectedReaction;
+
+        let currentPromise = contentReactionId ? deleteReaction(contentReactionId) : addReaction({id, contentId, userId});
+        
         lastAddReactionPromise.current = currentPromise;
 
         currentPromise.then((res) => {
-          if (lastAddReactionPromise.current === currentPromise) {
-            successReactionCallback({id, emoji, contentReactionId: res.data && res.data.id}, true);
+            //eslint-disable-next-line no-mixed-operators
+            const newContentReactionId = res && res.data && res.data.id || contentReactionId;
+            successReactionCallback({id, emoji, contentReactionId: newContentReactionId}, !contentReactionId);
             lastAddReactionPromise.current = null;
-          }
         }).catch(() => {
-          if (lastAddReactionPromise.current === currentPromise) {
-            setSelectedReaction({});
-            lastAddReactionPromise.current = null;
-          }
+          setSelectedReaction({});
+          lastAddReactionPromise.current = null;
         });
-      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedReaction, lastAddReactionPromise.current])
+  }, [selectedReaction, lastAddReactionPromise.current]);
 
-  useEffect(() => {
-    if (selectedReaction && selectedReaction.contentReactionId) {
-      if (!lastRemoveReactionPromise.current) {
-        const { id,  emoji, contentReactionId } = selectedReaction;
-        let currentPromise = deleteReaction(contentReactionId);
-
-        lastRemoveReactionPromise.current = currentPromise;
-
-        currentPromise.then((res) => {
-          if (lastRemoveReactionPromise.current === currentPromise) {
-            successReactionCallback({ id,  emoji, contentReactionId });
-            lastRemoveReactionPromise.current = null;
-          }
-        }).catch((res) => {
-          if (lastRemoveReactionPromise.current === currentPromise) {
-            setSelectedReaction({});
-            lastRemoveReactionPromise.current = null;
-          }
-        });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedReaction, lastRemoveReactionPromise.current])
-
-  const onSelectReaction = (emoji: any) => {
+  const onSelectReaction = debounce((emoji: any) => {
 
     let currentReaction = reactionsSummary.find((item: any) => item.emoji === emoji);
     
@@ -110,7 +87,7 @@ const Post = ({ post, reactions }: { post: TPost, reactions: TReactions}) => {
     }
 
     setSelectedReaction({...currentReaction, contentId: post.id, userId: currentUser.id})
-  }
+  }, 250)
 
   const successReactionCallback = (payload: any, shouldAddRection = false) => {
     const updatedReactions = getUpdatedReactions(reactionsSummary, payload, shouldAddRection, currentUser);
