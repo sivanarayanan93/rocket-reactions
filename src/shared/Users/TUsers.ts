@@ -7,9 +7,11 @@ export type TUser = {
   last_name: string,
   email: string,
   avatar: string,
+  name?: string
 }
 
 export type TUsersReducer = {
   currentUser:  TUser,
+  users:  TUser[],
   reactions: TReactions
 }

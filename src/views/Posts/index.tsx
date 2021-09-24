@@ -1,12 +1,22 @@
 
 import { TPosts } from '../../shared/Posts/TPosts';
-import { useSelector } from 'react-redux';
-import { TReducers } from '../../reducers';
 import Post from './Post';
+import { useEffect, useState } from 'react';
+import { getReactionsForPost } from '../../shared/Posts/PostModel';
 
 
-const Posts = ({ contents }: { contents : TPosts}) => {
-  const reactions = useSelector<TReducers, TReducers["User"]["reactions"]>(state => state.User.reactions);
+const Posts = ({ contents, showReactions }: { contents : TPosts, showReactions?: boolean}) => {
+  const  [reactions, setReactions] = useState([]);
+
+  useEffect(() => {
+    if (showReactions) {
+      getReactionsForPost().then((availReactios) => {
+        if(availReactios.length) {
+          setReactions(availReactios);
+        }
+      })
+    }
+  }, [showReactions])
 
   return (
     <>

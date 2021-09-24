@@ -2,13 +2,14 @@ import { TStringOrNumber } from "../common/TCommon";
 import { TUser } from "../Users/TUsers";
 
 export type TReaction = {
-  id: TStringOrNumber,
-  name?: string,
-  emoji: string | undefined,
-  count: number,
-  isReactedByCurrentUser: boolean,
+  id?: string,
+  emoji: string,
+  count?: number,
+  isReactedByCurrentUser?: boolean,
   userId?: TStringOrNumber | undefined,
   contentReactionId?: TStringOrNumber
+  users: TUser[],
+  name?: string
 }
 
 export type TReactions = TReaction[];

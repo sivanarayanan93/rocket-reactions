@@ -1,6 +1,5 @@
-import { getCurrentUserFromStore, getReactionsFromStore } from '../common/CommonModel';
 import { TUser } from '../Users/TUsers';
-import { TReactions } from './TReactions';
+import { TReaction, TReactions } from './TReactions';
 
 export const API_URL = {
   POST_REACTIONS: '/user_content_reactions',
@@ -12,35 +11,37 @@ export const API_URL = {
  * @param data 
  */
 
-export const getSelelcedReactions = (data: any) => {
+export const getSelelcedReactions = (data: any, metaData: any) => {
   const selectedReactionsTemp: TReactions = [],
-  currentUser = getCurrentUserFromStore(),
-  allReactions = getReactionsFromStore();
+    allReactions = metaData && metaData.reactions,
+    allUsers = metaData && metaData.users,
+    currentUser = metaData && metaData.currentUser;
 
   for(let postReaction of data) {
     const reactionId = postReaction.reaction_id,
-      index = selectedReactionsTemp.findIndex(reaction => reaction.id === reactionId);
-
-    const isReactedByCurrentUser = currentUser.id === postReaction.user_id;
+      index = selectedReactionsTemp.findIndex(reaction => reaction.id === reactionId),
+      user = allUsers.find((user: TUser) => user.id === postReaction.user_id);
 
     // Finding total count of reactions
     if(index >= 0) {
-      selectedReactionsTemp[index].count += 1;
-
-      // Finding if a reaction added by the current user
-      if (!selectedReactionsTemp[index].isReactedByCurrentUser && isReactedByCurrentUser) {
-        selectedReactionsTemp[index].isReactedByCurrentUser = isReactedByCurrentUser;
-        selectedReactionsTemp[index].contentReactionId = postReaction.id;
+      if(selectedReactionsTemp[index]) {
+        if (user) {
+          selectedReactionsTemp[index].users.push(user);
+          if (!selectedReactionsTemp[index].contentReactionId && user.id === currentUser.id) {
+            selectedReactionsTemp[index].contentReactionId = postReaction.id;
+          }
+        }
       }
+
     } else {
-      const reaction = allReactions.find(item => item.id === reactionId);
+      const reaction = allReactions.find((item: TReaction) => item.id === reactionId);
+
       selectedReactionsTemp.push({
         id: reactionId,
-        userId: postReaction.user_id,
-        contentReactionId: postReaction.id,
-        emoji: reaction && reaction.emoji,
-        count: 1,
-        isReactedByCurrentUser: isReactedByCurrentUser
+        users: user ? [user] : [],
+        emoji: reaction && String(reaction.name).toLowerCase(),
+        contentReactionId: user && user.id === currentUser.id ? postReaction.id : null,
+        count: 1
       })
     }
   }
@@ -48,35 +49,11 @@ export const getSelelcedReactions = (data: any) => {
   return selectedReactionsTemp;
 }
 
-/**
- * 
- * @param resData 
- */
-export const getContentReactors = (resData: any) => {
-
-  const allUsers = resData[0].data,
-    contentReactions = resData[1].data,
-    allReactions = getReactionsFromStore();
-
-  let resultSet = new Set();
-  for(const contentReaction of contentReactions) {
-    let user = allUsers.find((user: TUser) => user.id === contentReaction.user_id);
-    if (user) {
-      const reaction = allReactions.find(item => item.id === contentReaction.reaction_id);
-
-      user.emoji = reaction ? reaction.emoji : null;
-      resultSet.add(user);
-    }
-  }
-
-  return resultSet;
-}
-
-export const getUpdatedReactions = (reactions: TReactions, reactionPayload: any, shouldAddReaction = false) => {
+export const getUpdatedReactions = (reactions: TReactions, reactionPayload: any, shouldAddReaction = false, currentUser:TUser) => {
   const reactionId = reactionPayload && reactionPayload.id;
 
   if (!reactionId) {
-    return []
+    return reactions;
   };
 
   const tempReactions = [...reactions],
@@ -85,18 +62,12 @@ export const getUpdatedReactions = (reactions: TReactions, reactionPayload: any,
    reaction = tempReactions[index],
    emoji = reaction ? reaction.emoji : reactionPayload.emoji;
 
-   // Removing items if count is <= 1 on removing a reaction
-   if (!shouldAddReaction && reaction.count <= 1) {
-    return reactions.filter(item => item.id !== reactionId);
-  }
-
    const getTempReactions = () => {
       // Updating existing reaction's count to the state 
       tempReactions[index] = {
         ...reaction,
-        count: shouldAddReaction ? reaction.count + 1 : reaction.count - 1,
-        isReactedByCurrentUser: shouldAddReaction,
-        contentReactionId: contentReactionId 
+        users: shouldAddReaction ? [...reaction.users, currentUser] : reaction.users.filter(item => item.id !== currentUser.id),
+        contentReactionId: shouldAddReaction ? contentReactionId : null
       }
 
       return tempReactions;
@@ -109,12 +80,13 @@ export const getUpdatedReactions = (reactions: TReactions, reactionPayload: any,
    } else {
     // Addind new reactions to the state 
     updatedReactions = [...reactions,
-      { id: reactionId,
-        contentReactionId: contentReactionId,
+      {
+        id: reactionId,
+        users: [{ ...currentUser}],
         emoji,
-        count: 1,
-        isReactedByCurrentUser: true
-    }];
+        contentReactionId: contentReactionId,
+        count: 1
+      }];
   }
 
    return updatedReactions;

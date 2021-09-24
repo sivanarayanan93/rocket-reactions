@@ -1,0 +1,31 @@
+if (reactionId && !lastAddReactionPromise.current[reactionId]) {
+
+      // if (!lastAddReactionPromise.current) {
+        const {id, contentId, userId, emoji, contentReactionId} = selectedReaction;
+      
+        const currentPromise = contentReactionId ? deleteReaction(contentReactionId) : addReaction({id, contentId, userId});
+
+        lastAddReactionPromise.current[reactionId] = { currentPromise, reaction: selectedReaction };
+
+        currentPromise.then((res) => {
+          let response = res && res.data
+          // if (lastAddReactionPromise.current[response.reaction_id].currentPromise === currentPromise && response) {
+
+            const newContentReactionId = contentReactionId ? contentReactionId : res.data && response.id;
+
+            let currentReaction = { ...lastAddReactionPromise.current[response.reaction_id].reaction}
+
+            const oldId = currentReaction.id,
+            oldEmoji = currentReaction.emoji,
+            oldContentReactionId = currentReaction.contentReactionId;
+
+            successReactionCallback({id: oldId, emoji: oldEmoji, contentReactionId: newContentReactionId}, !oldContentReactionId);
+            delete lastAddReactionPromise.current[reactionId]
+          // }
+        }).catch(() => {
+          if (lastAddReactionPromise.current[reactionId].currentPromise === currentPromise) {
+            setSelectedReaction({});
+            delete lastAddReactionPromise.current[reactionId]
+          }
+        });
+      }
